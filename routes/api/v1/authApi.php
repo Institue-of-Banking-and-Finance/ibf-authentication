@@ -9,6 +9,7 @@ Route::prefix('auth')->group(function () {
     Route::middleware('auth:api')->group(function (){
         Route::post('/logout' , [AuthController::class , 'logout'])->name('user.logout');
         Route::get('/get-user',[AuthController::class , 'listUser'])->name('list.user');
+        Route::get('/get-course',[AuthController::class , 'getUserCourse'])->name('get.user.course');
     });
 });
 

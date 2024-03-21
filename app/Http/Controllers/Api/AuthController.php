@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -120,4 +121,24 @@ class AuthController extends Controller
             return $e->getMessage();
         }
     }
+
+     public function getUserCourse(Request $request )
+    {
+       try {
+            $response = Http::get('https://course.ibfnxt.com'. '/api/v1/course/get-all-course', [
+            ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                return response()->json($data); // Return JSON data
+            } else {
+
+                $statusCode = $response->status();
+                return response()->json(['error' => 'API call failed'], $statusCode);
+            }
+       } catch (\Exception $e) {
+            return $e->getMessage();
+       }
+    }
+
 }
