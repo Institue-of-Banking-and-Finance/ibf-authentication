@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -86,11 +87,11 @@ class AuthController extends Controller
 
             return response()->json($response , 200);
         } catch (\Exception $e) {
-            return $e->getMessage();
+
+         return $e->getMessage();
         }
 
     }
-
     public function logout(Request $request)
     {
         try {
@@ -99,6 +100,21 @@ class AuthController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'User is logged out successfully'
+                ], 200);
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    public function listUser()
+    {
+        try {
+            $user = Auth::user();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'get user successfully',
+                'data' => $user,
                 ], 200);
         } catch (\Exception $e) {
             return $e->getMessage();
