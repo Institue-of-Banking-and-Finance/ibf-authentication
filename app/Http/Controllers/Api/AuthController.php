@@ -23,7 +23,7 @@ class AuthController extends Controller
 
             if ($validate->failed()) {
                return response()->json([
-                    'status' => 'failed',
+                    'status' => false,
                     'message' => 'Validation Error!',
                     'data' => $validate->errors(),
                ], 403);
@@ -37,7 +37,7 @@ class AuthController extends Controller
 
             $data['token'] = $user -> createToken($request->email)->accessToken;
             $response = [
-                'status' => 'success',
+                'status' => true,
                 'message' => 'User is created successfully.',
                 'data' => $data,
             ];
@@ -60,7 +60,7 @@ class AuthController extends Controller
 
             if($validate->fails()){
                 return response()->json([
-                    'status'    => 'failed',
+                    'status'    => false,
                     'message'   => 'Validation error' ,
                     'data'      => $validate->errors(),
                 ] , 403);
@@ -72,7 +72,7 @@ class AuthController extends Controller
             //check the password
             if (!$user || !Hash::check($request->password , $user->password)) {
                 return response()->json([
-                    'status'  => 'failed' ,
+                    'status'  => false,
                     'message' => 'Invalid credentials'
                 ]);
             }
@@ -81,7 +81,7 @@ class AuthController extends Controller
             $data['user'] = $user;
 
             $response = [
-                'status'    => 'success' ,
+                'status'    => true,
                 'message'   => 'User logged in successfully.' ,
                 'data'      => $data
             ];
@@ -99,7 +99,7 @@ class AuthController extends Controller
             $token = $request->user()->token();
             $token->revoke();
             return response()->json([
-                'status' => 'success',
+                'status' => true,
                 'message' => 'User is logged out successfully'
                 ], 200);
         } catch (\Exception $e) {
@@ -113,7 +113,7 @@ class AuthController extends Controller
             $user = Auth::user();
 
             return response()->json([
-                'status' => 'success',
+                'status' => true,
                 'message' => 'get user successfully',
                 'data' => $user,
                 ], 200);
