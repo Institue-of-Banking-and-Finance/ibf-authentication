@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\LoginResource;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -70,7 +71,7 @@ class AuthController extends Controller
                 ] , 403);
             }
 
-            $user = User::where('email', $request->email)->first();
+            $user = User::with('roles.permissions')->where('email', $request->email)->first();
 
             if (!$user || !Hash::check($request->password , $user->password)) {
                 return response()->json([
@@ -80,7 +81,7 @@ class AuthController extends Controller
             }
 
             $data['token'] = $user->createToken($request->email)->accessToken;
-            $data['user'] = $user;
+            $data['user'] = new UserResource($user);
 
             $response = [
                 'status'    => true,
@@ -113,8 +114,8 @@ class AuthController extends Controller
     {
         try {
 
-             $user = User::with('roles.permissions')->where('id',Auth::user()->id)->first();
-             $data = new UserResource($user);
+            //  $user = User::with('roles.permissions')->where('id',Auth::user()->id)->first();
+            //  $data = new UserResource($user);
             return response()->json([
                 'status'    => true,
                 'message'   => 'get user successfully',
