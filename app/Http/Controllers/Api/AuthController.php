@@ -71,7 +71,23 @@ class AuthController extends Controller
                 ] , 403);
             }
 
-            $user = User::with('roles.permissions')->where('email', $request->email)->first();
+            $user = User::where('email', $request->email)->first();
+
+            $data['roles'] = $user->roles()->get()
+            ->flatten()
+            ->pluck('name')
+            ->values()
+            ->toArray();
+
+            $data['permissions'] = $user->roles()->with('permissions')
+            ->get()
+            ->pluck('permissions')
+            ->flatten()
+            ->pluck('name')
+            ->unique()
+            ->values()
+            ->toArray();
+
 
             if (!$user || !Hash::check($request->password , $user->password)) {
                 return response()->json([
