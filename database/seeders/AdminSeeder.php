@@ -20,6 +20,7 @@ class AdminSeeder extends Seeder
             'password' => Hash::make('123456')
         ]);
         $admin->assignRole('admin');
+        $admin->assignRole('teacher');
 
         $teacher = User::create([
             'name' => 'teacher',
