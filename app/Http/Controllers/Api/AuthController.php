@@ -113,9 +113,9 @@ class AuthController extends Controller
     public function listUser()
     {
         try {
-
-            //  $user = User::with('roles.permissions')->where('id',Auth::user()->id)->first();
-            //  $data = new UserResource($user);
+            // dd(Auth::user()->can('delete-user'));
+             $user = User::with('roles.permissions')->where('id',Auth::user()->id)->first();
+             $data = new UserResource($user);
             return response()->json([
                 'status'    => true,
                 'message'   => 'get user successfully',
