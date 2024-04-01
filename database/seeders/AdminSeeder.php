@@ -29,11 +29,27 @@ class AdminSeeder extends Seeder
         ]);
         $teacher->assignRole('teacher');
 
+        $trainer = User::create([
+            'name' => 'Marya',
+            'email' => 'rc@ibfkh.org',
+            'password' => Hash::make('12345678')
+        ]);
+        $trainer->assignRole('admin');
+
+        $ui_officer = User::create([
+            'name' => 'Lyna',
+            'email' => 'ui.officer@ibfkh.org',
+            'password' => Hash::make('12345678')
+        ]);
+        $ui_officer->assignRole('admin');
+
         $student = User::create([
             'name' => 'student',
             'email' => 'student@student.com',
             'password' => Hash::make('123456')
         ]);
         $student->assignRole('student');
+
+
     }
 }
