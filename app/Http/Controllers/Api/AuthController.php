@@ -14,7 +14,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 
-class AuthController extends Controller
+class
+
+AuthController extends Controller
 {
     use AuthorizesRequests;
     public function register (Request $request)
@@ -171,7 +173,12 @@ class AuthController extends Controller
     {
        try {
             if (Auth::guard('api')->check()) {
-                return response()->json(['valid' => true]);
+                $user = Auth::user()->id;
+                $data = new UserResource($user);
+                return response()->json([
+                    'valid' => true,
+                    'user_id' => $user
+                ]);
             } else {
                 return response()->json(['valid' => false], 401);
             }
