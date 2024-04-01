@@ -167,4 +167,17 @@ class AuthController extends Controller
        }
     }
 
+    public function validateToken(Request $request)
+    {
+       try {
+            if (Auth::guard('api')->check()) {
+                return response()->json(['valid' => true]);
+            } else {
+                return response()->json(['valid' => false], 401);
+            }
+       } catch (\Exception $e) {
+            return $e->getMessage();
+       }
+    }
+
 }
