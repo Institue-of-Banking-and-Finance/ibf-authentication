@@ -7,12 +7,18 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\LoginResource;
 use App\Http\Resources\UserResource;
+use App\Models\Course;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-
+use Illuminate\Support\Facades\DB;
+use Aws\DynamoDb\DynamoDbClient;
+use Illuminate\Http\JsonResponse;#
+use App\Enums\UserBfi;
+use App\Http\Resources\RoleResource;
+use Spatie\Permission\Models\Role;
 
 class
 
@@ -25,7 +31,8 @@ AuthController extends Controller
             $validate = Validator::make($request->all(),[
                 'name'      => 'required|string|max:250',
                 'email'     => 'required|string|email:rfc,dns|max:250|unique:users,email',
-                'password'  => 'required|string|min:8|confirmed'
+                'password'  => 'required|string|min:8|confirmed',
+                'bfi_id'       => 'required'
             ]);
 
             if ($validate->failed()) {
@@ -39,6 +46,7 @@ AuthController extends Controller
             $user = User::create([
                 'name'      => $request -> name,
                 'email'     => $request -> email,
+                'bfi_id'    => $request -> bfi_id,
                 'password'  =>  Hash::make($request->password)
             ]);
 
@@ -73,7 +81,7 @@ AuthController extends Controller
                 ] , 403);
             }
 
-            $user = User::where('email', $request->email)->first();
+            $user = User::where('email', $request->email)->with('bfi')->first();
 
             $data['roles'] = $user->roles()->get()
             ->flatten()
@@ -131,7 +139,6 @@ AuthController extends Controller
     public function listUser()
     {
         try {
-            // dd(Auth::user()->can('delete-user'));
              $user = User::with('roles.permissions')->where('id',Auth::user()->id)->first();
              $data = new UserResource($user);
             return response()->json([
@@ -173,8 +180,8 @@ AuthController extends Controller
     {
        try {
             if (Auth::guard('api')->check()) {
-                $user = Auth::user()->id;
-                $data = new UserResource($user);
+                $user =  User::where('id',Auth::user()->id)->first();
+                $user_course = $user->courses;
                 return response()->json([
                     'valid' => true,
                     'user_id' => $user
@@ -186,5 +193,110 @@ AuthController extends Controller
             return $e->getMessage();
        }
     }
+
+    public function enrollUserInCourse(Request $request)
+    {
+        try {
+                $dynamoDbClient = new DynamoDbClient([
+                    'region' => env('AWS_DEFAULT_REGION'),
+                    'version' => 'latest',
+                    'credentials' => [
+                        'key'    =>  env('AWS_ACCESS_KEY_ID'),
+                        'secret' =>  env('AWS_SECRET_ACCESS_KEY'),
+                    ]
+                ]);
+
+                $courses = DB::table('course_user')
+                ->where('user_id', $request->userId)
+                ->pluck('course_id')
+                ->toArray();
+
+                $courseDetails = [];
+            foreach ($courses as $courseId) {
+                $result = $dynamoDbClient->getItem([
+                    'TableName' => 'CourseMaterial',
+                    'Key' => [
+                        'PK' => ['S' => $courseId]
+                    ]
+                ]);
+
+                if (isset($result['Items'])) {
+                    $courses =  [];
+                    foreach ($result['Items'] as $item) {
+                        $course = [];
+                        foreach ($item as $key => $value) {
+                            $course[$key] = $value;
+                        }
+                        $courses[] = $course;
+                    }
+                    return response()->json($courses);
+                }
+            }
+                return new JsonResponse($courseDetails);
+
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    public function createEmployer(Request $request)
+    {
+        try {
+            $request->validate([
+                'name'      => 'required',
+                'bfi_id'    => 'required',
+                'role_id'   => 'required',
+                'email'     => 'required|email|unique:users,email',
+                'password'  => 'required|min:6',
+            ]);
+            $user = User::create([
+                'name'     => $request->name,
+                'bfi_id'   => $request->bfi_id,
+                'email'    => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+
+            DB::table('role_user')->insert([
+                'role_id' => $request->role_id,
+                'user_id' => $user->id,
+            ]);
+            
+            if($user){
+                return new JsonResponse([
+                    'status' => true,
+                    'message'=> 'The employer create successfully!!',
+                ]);
+            }else{
+                return new JsonResponse([
+                    'status' => false,
+                    'message'=> 'Something went wrong!!',
+                ]);
+            }
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    public function listRole()
+    {
+        try {
+           $roles = Role::get();
+           if (isset($roles)) {
+                return new JsonResponse([
+                    'status'    => true,
+                    'message'   => 'Get all role of user successfully!!',
+                    'data'      => RoleResource::collection($roles),
+                ],200);
+           }else{
+            return new JsonResponse([
+                'status'    => false,
+                'message'   => 'Something went wrong!!',
+            ],400);
+           }
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
 
 }

@@ -4,9 +4,8 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Spatie\Permission\Models\Role;
 
-class UserResource extends JsonResource
+class BfiResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,10 +15,9 @@ class UserResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'    => $this->id,
-            'name'  => $this->name,
-            'email' => $this->email,
-            'bfi'=> new BfiResource($this->whenLoaded('bfi')),
+            'id'   => $this->id,
+            'name' => $this->name,
+            'type' => $this->type
         ];
     }
 }
