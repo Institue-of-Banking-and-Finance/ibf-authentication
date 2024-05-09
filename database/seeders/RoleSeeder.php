@@ -13,9 +13,12 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
+
         $admin  =  Role::create(['name' => 'admin', 'guard_name' => 'api']);
         $teacher = Role::create(['name' => 'teacher' , 'guard_name' => 'api']);
         $student = Role::create(['name' => 'student', 'guard_name' => 'api']);
+        $human_resources = Role::create(['name' => 'HR', 'guard_name' => 'api']);
+
 
         $admin -> givePermissionTo([
             'create-user',
@@ -32,5 +35,13 @@ class RoleSeeder extends Seeder
         $student -> givePermissionTo([
             'create-user',
         ]);
+
+        $human_resources -> givePermissionTo([
+            'create-user',
+            'edit-user',
+            'delete-user',
+        ]);
+
+
     }
 }
