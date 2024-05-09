@@ -181,7 +181,6 @@ AuthController extends Controller
        try {
             if (Auth::guard('api')->check()) {
                 $user =  User::where('id',Auth::user()->id)->first();
-                $user_course = $user->courses;
                 return response()->json([
                     'valid' => true,
                     'user_id' => $user
@@ -260,7 +259,7 @@ AuthController extends Controller
                 'role_id' => $request->role_id,
                 'user_id' => $user->id,
             ]);
-            
+
             if($user){
                 return new JsonResponse([
                     'status' => true,
