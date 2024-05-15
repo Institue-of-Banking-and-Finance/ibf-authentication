@@ -37,10 +37,10 @@ class DepartmentController extends Controller
    {
         try {
             $departments = Department::get();
-            if(isset($departments)){
+            if($departments->isNotEmpty()){
                 return new JsonResponse([
                     'status'    => true,
-                    'message'   => 'List all departments 0!!',
+                    'message'   => 'List all departments !!',
                     'data'      => DepartmentResource::collection($departments)
                 ]);
             }else{
