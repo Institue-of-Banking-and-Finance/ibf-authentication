@@ -5,9 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\LoginResource;
 use App\Http\Resources\UserResource;
-use App\Models\Course;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
@@ -15,10 +13,11 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
 use Aws\DynamoDb\DynamoDbClient;
-use Illuminate\Http\JsonResponse;#
-use App\Enums\UserBfi;
+use Illuminate\Http\JsonResponse;
 use App\Http\Resources\RoleResource;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Str;
+
 
 class
 
@@ -246,13 +245,13 @@ AuthController extends Controller
                 'bfi_id'    => 'required',
                 'role_id'   => 'required',
                 'email'     => 'required|email|unique:users,email',
-                'password'  => 'required|min:6',
             ]);
+            $password = Str::password(8, true, true, false, false);
             $user = User::create([
                 'name'     => $request->name,
                 'bfi_id'   => $request->bfi_id,
                 'email'    => $request->email,
-                'password' => Hash::make($request->password),
+                'password' => $password,
             ]);
 
             DB::table('role_user')->insert([
@@ -264,6 +263,8 @@ AuthController extends Controller
                 return new JsonResponse([
                     'status' => true,
                     'message'=> 'The employer create successfully!!',
+                    'data'   => $user ,
+                    'password' => $password,
                 ]);
             }else{
                 return new JsonResponse([
