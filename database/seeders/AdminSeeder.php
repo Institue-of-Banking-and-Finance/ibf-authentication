@@ -15,6 +15,20 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
+        $finance = User::create([
+            'name' => 'Finance',
+            'email' => 'admin.finance@ibfkh.org',
+            'password' => Hash::make('finance123')
+        ]);
+        $finance->assignRole('finance');
+
+        $education = User::create([
+            'name' => 'education',
+            'email' => 'admin.edu@ibfkh.org',
+            'password' => Hash::make('edu123')
+        ]);
+        $education->assignRole('education');
+
         $demo = User::create([
             'name' => 'demo',
             'email' => 'demo@ibfkh.org',

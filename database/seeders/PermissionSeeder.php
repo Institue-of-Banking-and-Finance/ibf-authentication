@@ -14,6 +14,14 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         $permissions = [
+            'create-order',
+            'edit-order',
+            'delete-order',
+            'view-order',
+            'create-product',
+            'edit-product',
+            'delete-product',
+            'view-product',
             'create-role',
             'edit-role',
             'delete-role',
