@@ -13,6 +13,21 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
+        $education =  Role::create(['name' => 'education', 'guard_name' => 'api']);
+        $education -> givePermissionTo([
+            'create-product',
+            'edit-product',
+            'delete-product',
+            'view-product'
+        ]);
+        $finance =  Role::create(['name' => 'finance', 'guard_name' => 'api']);
+        $finance -> givePermissionTo([
+            'create-order',
+            'edit-order',
+            'delete-order',
+            'view-order'
+        ]);
+
 
         $admin  =  Role::create(['name' => 'admin', 'guard_name' => 'api']);
         $teacher = Role::create(['name' => 'teacher' , 'guard_name' => 'api']);

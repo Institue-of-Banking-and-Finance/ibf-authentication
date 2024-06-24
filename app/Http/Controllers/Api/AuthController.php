@@ -242,7 +242,7 @@ AuthController extends Controller
         try {
             $request->validate([
                 'name'      => 'required',
-                'bfi_id'    => 'required',
+                'bfi_id'    => 'required|exists:bfis,id',
                 'role_id'   => 'required',
                 'email'     => 'required|email|unique:users,email',
             ]);
@@ -254,6 +254,9 @@ AuthController extends Controller
                 'password' => $password,
             ]);
 
+            $userData = $user->toArray();
+            $userData['password'] = $password;
+
             DB::table('role_user')->insert([
                 'role_id' => $request->role_id,
                 'user_id' => $user->id,
@@ -263,8 +266,7 @@ AuthController extends Controller
                 return new JsonResponse([
                     'status' => true,
                     'message'=> 'The employer create successfully!!',
-                    'data'   => $user ,
-                    'password' => $password,
+                    'data'   => $userData ,
                 ]);
             }else{
                 return new JsonResponse([

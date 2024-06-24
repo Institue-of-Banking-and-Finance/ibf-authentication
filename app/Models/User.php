@@ -77,7 +77,7 @@ class User extends Authenticatable
      */
     public function bfis(): HasMany
     {
-        return $this->hasMany(BFI::class);
+        return $this->hasMany(BFI::class,'bfi_id' , 'id');
     }
 
     /**
