@@ -179,10 +179,10 @@ AuthController extends Controller
     {
        try {
             if (Auth::guard('api')->check()) {
-                $user =  User::where('id',Auth::user()->id)->first();
+                $user =  User::with('bfi')->where('id',Auth::user()->id)->first();
                 return response()->json([
                     'valid' => true,
-                    'user_id' => $user
+                    'user_id' => new UserResource($user)
                 ]);
             } else {
                 return response()->json(['valid' => false], 401);
