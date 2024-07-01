@@ -183,7 +183,7 @@ AuthController extends Controller
                 return response()->json([
                     'status'    => true,
                     'message'   => 'The user validated',
-                    'user_id' => new UserResource($user)
+                    'data' => new UserResource($user)
                 ]);
             } else {
                 return response()->json(['valid' => false], 401);
