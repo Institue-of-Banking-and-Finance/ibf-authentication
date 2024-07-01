@@ -181,9 +181,8 @@ AuthController extends Controller
             if (Auth::guard('api')->check()) {
                 $user =  User::with('bfi')->where('id',Auth::user()->id)->first();
                 return response()->json([
-                    'status'    => true,
-                    'message'   => 'The user validated',
-                    'data' => new UserResource($user)
+                    'message' => true,
+                    'user_id' => $user
                 ]);
             } else {
                 return response()->json(['valid' => false], 401);
